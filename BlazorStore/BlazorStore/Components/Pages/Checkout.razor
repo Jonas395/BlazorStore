@@ -1,0 +1,103 @@
+﻿@page "/checkout"
+
+@inject DataAccess dataAccess
+@inject NavigationManager navigationManager
+@inject ILocalStorageService localStorage
+@using BlazorStore.Components.Layout
+
+@rendermode InteractiveServer
+@attribute [StreamRendering]
+
+<h2>Checkout</h2>
+
+<h3>Shipping details</h3>
+<EditForm Model="userInfo" OnSubmit="HandleSubmit" FormName="userInfoForm" class="user-form" style="background-color: lightblue;
+    margin: 20px;
+    padding: 15px;
+    list-style-type: none;
+    border-radius: 6px;">
+    <label>First Name</label>
+    <InputText @bind-Value="userInfo.FirstName" disabled="@shippingConfirmed">userInfo.FirstName</InputText>
+    <br>
+    <label>Last Name</label>
+    <InputText @bind-Value="userInfo.LastName" disabled="@shippingConfirmed">userInfo.LastName</InputText>
+    <br>
+    <label>Address</label>
+    <InputText @bind-Value="userInfo.AdressStreet" disabled="@shippingConfirmed">userInfo.AdressStreet</InputText>
+    <br>
+    <label>City</label>
+    <InputText @bind-Value="userInfo.AdressCity" disabled="@shippingConfirmed">userInfo.AdressCity</InputText>
+    <br>
+    <label>Phone</label>
+    <InputNumber @bind-Value="userInfo.Phone" disabled="@shippingConfirmed">userInfo.phone</InputNumber>
+    <br>
+    <label>Email</label>
+    <InputText @bind-Value="userInfo.Mail" disabled="@shippingConfirmed">userInfo.Mail</InputText>
+    <br>
+    <button type="submit" class="btn btn-primary">@(shippingConfirmed ? "Edit shipping details" : "Confirm shipping details")</button>
+</EditForm>
+
+
+<h3>Final order overview</h3>
+<h4>Shipping adress</h4>
+<ul>
+    <li>Name: @userInfo.FirstName @userInfo.LastName</li>
+    <li>Address: @userInfo.AdressStreet @userInfo.AdressCity</li>
+    <li>Contact: Phone: @userInfo.Phone Email: @userInfo.Mail</li>
+</ul>
+<h4>Items</h4>
+<ul>
+    @foreach (var group in CartList.GroupBy(p => p.ProductId))
+    {
+        var product = group.Last();
+        var count = group.Count();
+        var itemTotal = count * product.ProductPrice;
+        <li>
+            <h3>@count @product.ProductName: $@itemTotal</h3>
+        </li>
+    }
+</ul>
+
+<h4>Total cost: $@TotalCost</h4>
+
+
+<button disabled="@placeOrderButton" class="btn btn-primary" @onclick="PlaceOrder">Place Order</button>
+<br />
+<br />
+@code {
+    public List<Product> CartList { get; set; } = new List<Product>();
+    public UserInfo userInfo { get; set; } = new UserInfo { };
+    public double TotalCost => CartList.Sum(p => p.ProductPrice);
+    public bool shippingConfirmed = false;
+    public bool placeOrderButton = true;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var productData = await localStorage.GetItemAsync<List<Product>>("Product");
+            if (productData is not null)
+            {
+                CartList = productData;
+                StateHasChanged();
+            }
+            var userData = await localStorage.GetItemAsync<UserInfo>("User");
+            if (userData is not null)
+            {
+                userInfo = userData;
+                StateHasChanged();
+            }
+        }
+    }
+
+    async Task HandleSubmit()
+    {
+        await localStorage.SetItemAsync<UserInfo>("User", userInfo);
+        shippingConfirmed = !shippingConfirmed;
+        placeOrderButton = !placeOrderButton;
+    }
+
+    async Task PlaceOrder()
+    {
+        navigationManager.NavigateTo("/order-placed");
+    }
+}

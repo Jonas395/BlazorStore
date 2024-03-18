@@ -1,0 +1,51 @@
+﻿@page "/product-list"
+
+@inject DataAccess dataAccess
+@inject NavigationManager navigationManager
+
+@rendermode InteractiveServer
+@attribute [StreamRendering]
+
+<h3>ProductList</h3>
+
+@if (products is null)
+{
+	<p>Loading...</p>
+}
+else
+{
+	<ul>
+		@foreach (var product in products)
+		{
+			<li>
+				@product.ProductName
+				@product.ProductPrice
+				<button @onclick="() => EditProduct(product.ProductId)">Edit</button>
+			</li>
+		}
+	</ul>
+	<button class="btn btn-primary" @onclick="AddNewProduct">Add new product</button>
+}
+@code {
+	private List<Product> products;
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			var result = await dataAccess.GetAllProducts();
+			products = result;
+			StateHasChanged();
+		}
+	}
+
+	void AddNewProduct()
+	{
+		navigationManager.NavigateTo("/product-edit");
+	}
+
+	void EditProduct(int id)
+	{
+		navigationManager.NavigateTo("/product-edit/" + id);
+	}
+}

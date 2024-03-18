@@ -1,0 +1,76 @@
+﻿@page "/"
+
+@inject DataAccess dataAccess
+@inject NavigationManager navigationManager
+@inject ILocalStorageService localStorage
+@using BlazorStore.Components.Layout
+
+@rendermode InteractiveServer
+@attribute [StreamRendering]
+
+<h3>BlazorStore</h3>
+<!--<button @onclick="Clear">Clear LocalStorage</button>-->
+<div class="flex-container">
+	@if (ProductList is null)
+	{
+		<p>Loading...</p>
+	}
+	else
+	{
+			@foreach (var product in ProductList)
+			{
+			<ProductCardStore CardProduct="product" CartAdd="async () => ProductAdd(product)"/>
+			}
+	}
+</div>
+@code {
+	public List<Product> ProductList { get; set; } = new List<Product>();
+	public List<Product> CartList { get; set; } = new List<Product>();
+
+	public string local = "No Local storage found";
+
+	protected override async Task OnInitializedAsync()
+	{
+		var result = await dataAccess.GetAllProducts();
+		ProductList = result;
+	}
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			var productData = await localStorage.GetItemAsync<List<Product>>("Product");
+			if (productData is not null)
+			{
+				CartList = productData;
+				StateHasChanged(); 
+			}
+		}
+	}
+
+
+	public async Task ProductAdd(Product product)
+	{
+		if (CartList == null)
+		{
+			CartList = new List<Product>();
+		}
+
+		else
+		{
+			CartList.Add(product);
+			await localStorage.SetItemAsync("Product", CartList);
+		}
+	}
+
+	public async Task ProductRemove(Product product)
+	{
+		CartList.Remove(product);
+		await localStorage.SetItemAsync<List<Product>>("Product", CartList);
+	}
+	public async void Clear()
+	{
+		await localStorage.ClearAsync();
+		Console.WriteLine("Local storage cleared");
+	}
+}

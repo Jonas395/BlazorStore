@@ -1,0 +1,50 @@
+﻿p {
+    font-size: 12px;
+}
+img {
+    margin: 10px;
+    border-radius: 12px;
+}
+
+h1 {
+    margin: 20px;
+}
+h2 {
+    margin: 20px;
+}
+h5 {
+    margin: 30px;
+}
+p {
+    margin: 20px;
+    margin-left: 70px;
+}
+.highlight {
+    background-color: yellow;
+    border: 5px solid red;
+    padding: 20px;
+    border-radius: 19px;
+    object-fit: contain;
+    margin: 30px;
+}
+
+.text-bulk {
+    background-color: whitesmoke;
+    border-radius: 20px;
+    margin: 50px;
+    padding: 10px;
+}
+
+.cart-button {
+    border-radius: 8px;
+    background-color: white;
+}
+.clickable {
+    border: 3px solid lightslategrey;
+    background-color: lightblue;
+    margin: 20px;
+}
+
+.cart-button:hover {
+    background-color: lightgray;
+}

@@ -1,0 +1,71 @@
+﻿@page "/order-placed"
+
+@inject DataAccess dataAccess
+@inject NavigationManager navigationManager
+@inject ILocalStorageService localStorage
+@using BlazorStore.Components.Layout
+
+@rendermode InteractiveServer
+@attribute [StreamRendering]
+
+<h2>Order successfully placed</h2>
+
+<h3>Purchased Items</h3>
+<ul>
+	@foreach (var group in CartList.GroupBy(p => p.ProductId))
+	{
+		var product = group.Last();
+		var count = group.Count();
+		var itemTotal = count * product.ProductPrice;
+		<li>
+			<h3>@count @product.ProductName: $@itemTotal</h3>
+		</li>
+	}
+</ul>
+
+<h3>Shipping details</h3>
+<ul>
+	<li>Name: @userInfo.FirstName @userInfo.LastName</li>
+	<li>Adress: @userInfo.AdressStreet @userInfo.AdressCity</li>
+	<li>Contact: Phone: @userInfo.Phone Email: @userInfo.Mail</li>
+</ul>
+
+<h4>Total cost: $@TotalCost</h4>
+
+<button class="btn btn-primary" @onclick="Return">Return to main page</button>
+
+
+@code {
+	public List<Product> CartList { get; set; } = new List<Product>();
+
+	public UserInfo userInfo { get; set; } = new UserInfo { };
+
+	public double TotalCost => CartList.Sum(p => p.ProductPrice);
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			var productData = await localStorage.GetItemAsync<List<Product>>("Product");
+			if (productData is not null)
+			{
+				CartList = productData;
+				StateHasChanged();
+			}
+			var userData = await localStorage.GetItemAsync<UserInfo>("User");
+			if (userData is not null)
+			{
+				userInfo = userData;
+				StateHasChanged();
+			}
+		}
+		await localStorage.ClearAsync();
+
+	}
+	
+
+	async Task Return()
+	{
+		navigationManager.NavigateTo("/");
+	}
+}

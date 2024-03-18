@@ -1,0 +1,41 @@
+﻿@using BlazorStore.Components.Pages;
+@inject DataAccess dataAccess;
+@inject NavigationManager navigationManager;
+
+
+<div class="clickable">
+	<h2 @onclick="() => GoToProduct(CardProduct.ProductId)">@CardProduct.ProductName: $@CardProduct.ProductPrice </h2>
+	<button class="cart-button" @onclick="RemoveFromCart">Remove from cart</button>
+</div>
+
+
+
+@code {
+	[Parameter]
+	public Product CardProduct { get; set; }
+	[Parameter]
+	public EventCallback CartRemove { get; set; }
+	[Parameter]
+	public EventCallback CartAdd { get; set; }
+
+
+	public async Task RemoveFromCart()
+	{
+		await CartRemove.InvokeAsync();
+
+	}
+	public async Task AddToCart()
+	{
+		await CartAdd.InvokeAsync();
+	}
+
+	protected override void OnInitialized()
+	{
+
+	}
+	void GoToProduct(int id)
+	{
+		navigationManager.NavigateTo("/product-page/" + id);
+
+	}
+}

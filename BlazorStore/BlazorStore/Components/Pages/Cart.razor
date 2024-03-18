@@ -1,0 +1,66 @@
+﻿@page "/cart"
+
+@inject DataAccess dataAccess
+@inject NavigationManager navigationManager
+@inject ILocalStorageService localStorage
+@using BlazorStore.Components.Layout
+
+@rendermode InteractiveServer
+@attribute [StreamRendering]
+
+<h2>The cart</h2>
+
+@if (CartList == null || CartList.Count == 0)
+{
+	<p>Cart is empty</p>
+}
+else
+{
+	<h3>Items in cart</h3>
+	<div>
+		@foreach (var group in CartList.GroupBy(p => p.ProductId))
+		{
+			var product = group.Last();
+			var count = group.Count();
+			<div>
+				<ProductCardCart CardProduct="product" CartRemove="async () => ProductRemove(product)" />
+				<h4>Quantity: @count</h4>
+			</div>
+		}
+	</div>
+	<p>Total cost: $@TotalCost</p>
+	<button class="btn btn-primary" @onclick="GoToCheckout">Proceed to checkout</button>
+}
+
+
+
+
+
+@code {
+	public List<Product> CartList { get; set; } = new List<Product>();
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			var productData = await localStorage.GetItemAsync<List<Product>>("Product");
+			if (productData is not null)
+			{
+				CartList = productData;
+				StateHasChanged(); 
+			}
+		}
+	}
+	public double TotalCost => CartList.Sum(p => p.ProductPrice);
+
+	public async Task ProductRemove(Product product)
+	{
+		CartList.Remove(product);
+		await localStorage.SetItemAsync<List<Product>>("Product", CartList);
+	}
+
+	void GoToCheckout()
+	{
+		navigationManager.NavigateTo("/checkout");
+	}
+}

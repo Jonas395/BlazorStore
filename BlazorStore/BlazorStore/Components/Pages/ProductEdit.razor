@@ -1,0 +1,56 @@
+﻿@page "/product-edit"
+@page "/product-edit/{id:int}"
+
+@rendermode InteractiveServer
+
+@inject NavigationManager navigationManager
+@inject DataAccess dataAccess
+
+<h3>AddProduct</h3>
+
+<EditForm Model="product" OnSubmit="HandleSubmit" FormName="productForm">
+	<label>Name</label>
+	<InputText @bind-Value="product.ProductName">@product.ProductName</InputText>
+	<label>Description</label>
+	<InputText @bind-Value="product.ProductDescription">@product.ProductDescription</InputText>
+	<label>Price</label>
+	<InputNumber @bind-Value="product.ProductPrice">@product.ProductPrice</InputNumber>
+	<label>Image</label>
+	<InputText @bind-Value="product.ProductImageURL">@product.ProductImageURL</InputText>
+	<button type="submit" class="btn btn-primary">Submit</button>
+</EditForm>
+@code {
+	[Parameter]
+	public int Id { get; set; }
+
+	[SupplyParameterFromForm]
+	public Product product { get; set; } = new Product { ProductName = "" };
+
+	private bool editMode = false;
+
+	async Task HandleSubmit()
+	{
+		if (editMode)
+		{
+			await dataAccess.UpdateProduct(product);
+		}
+		else
+		{
+			await dataAccess.AddProduct(product);
+		}
+		navigationManager.NavigateTo("/product-list");
+	}
+
+	protected override async Task OnInitializedAsync()
+	{
+		if (Id != 0)
+		{
+			var result = await dataAccess.GetProductById(Id);
+			if (result is not null)
+			{
+				product = result;
+				editMode = true;
+			}
+		}
+	}
+}

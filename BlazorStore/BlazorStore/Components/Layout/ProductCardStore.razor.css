@@ -1,0 +1,32 @@
+﻿p {
+    font-size: 12px;
+}
+img {
+    width: 400px;
+    margin: 10px;
+    border-radius: 12px;
+}
+
+h2 {
+    margin: 10px;
+}
+
+.cart-button {
+    border-radius: 5px;
+    margin: 5px;
+}
+.clickable {
+    cursor: pointer;
+    border: 3px solid lightslategrey;
+    background-color: lightblue;
+    margin: 20px;
+    border-radius: 12px;
+}
+
+.clickable:hover {
+        border-color: black;
+    }
+
+.cart-button:hover {
+    background-color: lightgray;
+}

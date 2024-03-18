@@ -1,0 +1,38 @@
+﻿@using BlazorStore.Components.Pages;
+@inject DataAccess dataAccess;
+@inject NavigationManager navigationManager;
+
+
+<div class="clickable">
+	<img class="image" src="@CardProduct.ProductImageURL" alt="@CardProduct.ProductName"
+	@onclick="() => GoToProduct(CardProduct.ProductId)" />
+	<h2 @onclick="() => GoToProduct(CardProduct.ProductId)">@CardProduct.ProductName: $@CardProduct.ProductPrice </h2>
+
+	<button class="cart-button" @onclick="AddToCart">Add "@CardProduct.ProductName" to cart 🛒</button>
+</div>
+
+
+@code {
+	[Parameter]
+	public Product CardProduct { get; set; }
+	[Parameter]
+	public EventCallback CartAdd { get; set; }
+
+
+	public async Task AddToCart()
+	{
+		await CartAdd.InvokeAsync();
+
+	}
+
+
+	protected override void OnInitialized()
+	{
+
+	}
+	void GoToProduct(int id)
+	{
+		navigationManager.NavigateTo("/product-page/" + id);
+
+	}
+}

@@ -1,0 +1,13 @@
+﻿@using BlazorStore.Components.Pages;
+@inject DataAccess dataAccess;
+@inject NavigationManager navigationManager;
+
+
+<div class="clickable">
+	<h2>@CardProduct.ProductName: $@CardProduct.ProductPrice </h2>
+</div>
+
+@code {
+	[Parameter]
+	public Product CardProduct { get; set; }
+}

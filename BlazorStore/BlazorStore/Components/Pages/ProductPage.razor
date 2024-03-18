@@ -1,0 +1,62 @@
+﻿@page "/product-page"
+@page "/product-page/{id:int}"
+
+@rendermode InteractiveServer
+@inject ILocalStorageService localStorage
+@inject NavigationManager navigationManager
+@inject DataAccess dataAccess
+@using BlazorStore.Components.Layout
+
+<h1>@product.ProductName</h1>
+<ProductCardFull CardProduct="product" CartAdd="async () => ProductAdd(product)" />
+
+
+@code {
+	[Parameter]
+	public int Id { get; set; }
+
+	[SupplyParameterFromForm]
+	public Product product { get; set; } = new Product { ProductName = "" };
+
+
+	public List<Product> CartList { get; set; } = new List<Product>();
+
+	protected override async Task OnInitializedAsync()
+	{
+		if (Id != 0)
+		{
+			var result = await dataAccess.GetProductById(Id);
+			if (result is not null)
+			{
+				product = result;
+			}
+		}
+	}
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			var productData = await localStorage.GetItemAsync<List<Product>>("Product");
+			if (productData is not null)
+			{
+				CartList = productData;
+				StateHasChanged(); 
+			}
+		}
+	}
+
+	public async Task ProductAdd(Product product)
+	{
+		
+		if (CartList == null)
+		{
+			CartList = new List<Product>();
+		}
+
+		else
+		{
+			CartList.Add(product);
+			await localStorage.SetItemAsync("Product", CartList);
+		}
+	}
+}

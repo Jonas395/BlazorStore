@@ -1,0 +1,44 @@
+﻿@using BlazorStore.Components.Pages;
+@inject DataAccess dataAccess;
+@inject NavigationManager navigationManager;
+
+
+<div class="clickable">
+	<img class="image" src="@CardProduct.ProductImageURL" alt="@CardProduct.ProductName"
+
+	<h1>
+		<span class="highlight">$@CardProduct.ProductPrice</span>
+		<button class="cart-button" @onclick="AddToCart">Add 🛒</button>
+	</h1>
+	<div class="text-bulk">
+		<h2>@CardProduct.ProductName</h2>
+		<h5>
+			@CardProduct.ProductDescription
+		</h5>
+	</div>
+	<p>
+		EAN-18: @CardProduct.ProductId
+	</p>
+</div>
+
+
+@code {
+	[Parameter]
+	public Product CardProduct { get; set; }
+	[Parameter]
+	public EventCallback CartAdd { get; set; }
+
+	private string? imageSource;
+
+	private void ShowImage(int id)
+	{
+		imageSource = CardProduct.ProductImageURL;
+	}
+
+
+	public async Task AddToCart()
+	{
+		await CartAdd.InvokeAsync();
+
+	}
+}

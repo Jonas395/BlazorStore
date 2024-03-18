@@ -1,0 +1,28 @@
+﻿h3, h4{
+    margin-left: 40px;
+}
+
+ul {
+    background-color: lightblue;
+    margin: 20px;
+    padding: 15px;
+    list-style-type: none;
+    border-radius: 6px;
+}
+
+li{
+    background-color: lightgray;
+    margin: 5px;
+    border-radius: 5px;
+}
+li:nth-child(2n+1) {
+    background-color: whitesmoke;
+}
+h2{
+    margin-left: 40px;
+}
+button {
+    margin-top: 30px;
+    margin-left: 30px;
+}
+
